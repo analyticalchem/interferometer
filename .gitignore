@@ -1,0 +1,6 @@
+# Local development only: preview server, launch config and the in-page audit tool.
+.claude/
+# Office files and the working plan stay out of the repository.
+*.docx
+*.pptx
+PLAN.md

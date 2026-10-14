@@ -1,0 +1,191 @@
+/* FTIR Interferometer: this page's own layout, drawing styles, the Key block, the signal chart and
+   the transform walkthrough. House tokens and components are in css/styles.css. */
+
+/* ---------- Controls ---------- */
+
+.control .label { margin: 0 0 8px; font-weight: 600; }
+/* The probe's value changes on every frame of a sweep, so it is plain text, not a live <output>;
+   the slider's own value text still reports it. */
+.control .value-out { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: 600; white-space: nowrap; }
+.control .chips { margin-bottom: 6px; }
+.run-status { margin: 10px 0 0; font-size: 0.9rem; color: var(--text-secondary); }
+.run-status:empty { margin: 0; }
+
+/* Instrument Controls keep one size whatever the source, sample or scan state, so the panels below
+   never move: every control is always present, the Scan button is as wide as its longest label, and
+   the status line keeps one line's height even when empty. */
+.controls .card-head { margin-bottom: 10px; }
+.controls .run-row { margin-top: 12px; padding-top: 12px; gap: 10px 10px; }
+.scan-btn { min-width: 6.5rem; }
+.scan-status, .scan-status:empty { margin: 8px 0 0; min-height: 1.5em; }
+.sample-select { display: block; margin: 8px 0 6px; }
+/* A wavenumber box with its wavelength beside it. The wavelength keeps one width for every value, so
+   the head only wraps (box under the label) by the width of the page, never by the value. */
+.wn-head { flex-wrap: wrap; }
+.wn-head .entry { margin-left: auto; }
+.wn-num { width: 4.2em; }
+.entry .wl { color: var(--text-secondary); font-weight: 600; font-variant-numeric: tabular-nums; }
+.entry .wl-n { display: inline-block; min-width: 2.9em; text-align: right; }
+.stack-sub { display: grid; }
+.stack-sub > span { grid-area: 1 / 1; }
+.stack-sub > .is-off { visibility: hidden; }
+
+.chart-options { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+.option-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.option-label { font-weight: 600; font-size: 0.9rem; }
+
+/* ---------- The instrument drawings ---------- */
+
+/* The drawing fills the panel. Where the panel is wide enough (main.js adds .overlay), the Detector
+   Signal chart lies over the drawing's clear top right corner, its place and shape given by the
+   drawing (--chart-w and --chart-top as percentages of the drawing's width, --chart-ratio its width ÷
+   height), so it stays beside the interferometer and above the sample compartment at every width.
+   Otherwise the chart sits under the drawing. */
+.instrument {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px 24px;
+  align-items: start;
+}
+.instrument.overlay > .diagram-box, .instrument.overlay > .signal-box { grid-area: 1 / 1; }
+.instrument.overlay > .signal-box {
+  justify-self: end; width: var(--chart-w); aspect-ratio: var(--chart-ratio); margin-top: var(--chart-top);
+  display: flex; flex-direction: column; position: relative;
+}
+.instrument.overlay .signal-visual { flex: 1 1 0; height: auto; min-height: 0; }
+.instrument.overlay .diagram-svg { min-width: 0; }
+.diagram-svg { display: block; width: 100%; height: auto; min-width: 600px; }
+.signal-box { min-width: 0; }
+.signal-title { margin: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+.signal-visual { --h: clamp(240px, 24vw, 320px); margin-top: 6px; }
+.signal-box .legend { margin-top: 8px; }
+.visual-scroll { overflow-x: auto; overflow-y: hidden; padding: 0 12px; margin: 0 -12px; }
+.scale-note { margin: 10px 0 0; font-size: 0.85rem; color: var(--text-secondary); }
+
+/* Drawn text never renders below the chart text size: --sch-u is set by script (style guide 8.7). */
+.schem { --sch-font: 14px; --sch-font-small: 12px; --sch-u: 1; font-family: var(--font); }
+.schem text { font-size: max(var(--sch-font), calc(var(--chart-font) * 1.15 * var(--sch-u))); fill: var(--text-primary); }
+.schem .sch-small { font-size: max(var(--sch-font-small), calc(var(--chart-font) * var(--sch-u))); fill: var(--text-secondary); }
+.schem .sch-title { font-weight: 650; }
+
+.schem .housing { fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-dasharray: 8 6; }
+.schem .beam-band { stroke: var(--beam-band); stroke-width: 14; }
+.schem .beam-line { stroke: var(--text-primary); stroke-width: max(1.5px, calc(var(--chart-line) * 0.75)); vector-effect: non-scaling-stroke; }
+.schem .glow { fill: var(--glow); stroke: var(--part-wall); stroke-width: 1.5; }
+.schem .splitter { fill: var(--glass); stroke: var(--part-wall); stroke-width: 1.5; }
+.schem .mirror { fill: var(--mirror); stroke: var(--part-wall); stroke-width: 1.5; }
+.schem .mirror-post { stroke: var(--part-wall); stroke-width: 3; }
+.schem .track-line { stroke: var(--text-secondary); stroke-width: 2; }
+.schem .track-head { fill: var(--text-secondary); }
+.schem .track-zero { stroke: var(--text-primary); stroke-width: 2; }
+.schem .movable { cursor: ew-resize; touch-action: none; }
+.schem .hit { fill: transparent; stroke: none; pointer-events: all; cursor: ew-resize; touch-action: none; }
+.schem .compartment { fill: var(--surface-2); stroke: var(--part-wall); stroke-width: 1.5; }
+.schem .salt { fill: var(--glass); stroke: var(--part-wall); stroke-width: 1.2; }
+.schem .liquid { fill: var(--liquid); stroke: var(--part-wall); stroke-width: 1; }
+.schem .film-card { fill: var(--card-stock); stroke: var(--part-wall); stroke-width: 1.2; }
+.schem .film { fill: var(--film); stroke: var(--part-wall); stroke-width: 1; }
+.schem .gas { fill: var(--gas); stroke: var(--part-wall); stroke-width: 1.2; }
+.schem .empty-slot { fill: none; stroke: var(--part-wall); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.schem .detector { fill: var(--detector); stroke: var(--part-wall); stroke-width: 1.5; }
+.schem .meter-track { fill: color-mix(in srgb, var(--accent) 16%, var(--surface)); stroke: var(--part-wall); stroke-width: 1; }
+.schem .meter-fill { fill: var(--accent); }
+
+/* The beam as a wave, for one or two wavelengths; the broadband beam keeps its line. */
+.schem .inst-waves { display: none; }
+.schem.waves-on .inst-waves { display: inline; }
+.schem.waves-on .beam-line { display: none; }
+.schem.waves-on .beam-band { stroke-width: 26; }
+.schem .inst-waves path { fill: none; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+/* The outgoing wave is thin in the text colour. The two reflected waves are the same width, orange under
+   blue: in step they coincide and draw as one line; out of step they separate, orange and blue. */
+.schem .iw-out { stroke: var(--text-primary); stroke-width: max(1.5px, calc(var(--chart-line) * 0.75)); }
+.schem .iw-fixed { stroke: var(--wave-fixed); stroke-width: var(--chart-line); }
+.schem .iw-moving { stroke: var(--series-c); stroke-width: var(--chart-line); }
+
+/* ---------- Key (style guide 7.10.1) and the probe's list ---------- */
+
+/* A dash-dot swatch, matching the chart's [10, 4, 2, 4] pattern: a fourth line style, so the empty
+   holder's interferogram differs from the dashed and dotted components by more than colour. */
+.lg-key.dashdot {
+  height: 3px; border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--key) 0 10px, transparent 10px 14px, var(--key) 14px 16px, transparent 16px 20px);
+}
+
+.info-block { margin-top: 14px; }
+.info-title { margin: 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+.info-block .legend { margin-top: 6px; }
+.state-list { margin: 4px 0 0; font-size: 0.9rem; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.state-list > div { display: flex; flex-wrap: wrap; gap: 0 14px; padding: 5px 0; border-top: 1px solid var(--border); }
+.state-list > div:last-child { border-bottom: 1px solid var(--border); }
+.state-list dt { flex: 0 0 8.5rem; font-weight: 600; color: var(--text-primary); }
+.state-list dd { flex: 1 1 12rem; margin: 0; color: var(--text-primary); }
+
+/* ---------- Charts ---------- */
+
+.chart-visual { position: relative; margin-top: 12px; }
+.chart-visual canvas { display: block; width: 100%; height: 100%; }
+.ifg-visual { --h: clamp(220px, 26vw, 300px); }
+.spec-visual { --h: clamp(240px, 28vw, 320px); }
+.step-visual { --h: clamp(440px, 50vw, 560px); }
+/* A collapsible panel: its title is the h2 inside the summary (style guide 5). */
+.fold > summary { cursor: pointer; }
+.fold > summary h2 { display: inline; }
+.fold[open] > summary { margin-bottom: 4px; }
+.chart-scale { margin: 6px 0 0; font-size: 0.82rem; color: var(--text-secondary); }
+.chart-scale:empty { margin: 0; }
+
+.table-view { margin-top: 12px; }
+.table-view summary { cursor: pointer; font-weight: 600; color: var(--text-secondary); }
+.table-note { margin: 8px 0 0; font-size: 0.85rem; color: var(--text-secondary); }
+.table-note:empty { margin: 0; }
+.results table td.text { min-width: 12rem; }
+
+/* ---------- The Fourier transform ---------- */
+
+/* Each checkbox has its own line, so revealing the window choice never moves the apodization one. */
+.ft-text { max-width: 85ch; }
+.ft-text p { margin: 0 0 8px; }
+.ft-text .option-group { margin-top: 4px; }
+.apod-check, .bg-check { display: flex; width: fit-content; }
+.apod-check { margin-top: 4px; }
+.apod-block { margin-top: 8px; }
+.bg-check { margin-top: 10px; }
+.probe-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; align-items: end; margin-top: 14px; }
+.probe-buttons { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 4px; }
+.probe-list { max-width: 42rem; margin-top: 10px; }
+.step-options { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 12px; }
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 560px) {
+  .probe-row { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- Presentation mode ---------- */
+
+@media (min-width: 900px) {
+  html[data-present] .state-list { font-size: 1.05rem; }
+  html[data-present] .info-title, html[data-present] .signal-title { font-size: 0.9rem; }
+  html[data-present] .scale-note, html[data-present] .chart-scale,
+  html[data-present] .run-status { font-size: 1.05rem; }
+}
+
+/* ---------- Extras: noise, unknowns ---------- */
+
+.chip:disabled { opacity: 0.4; cursor: not-allowed; }
+.quiz { padding: 12px 0 4px; border-top: 1px solid var(--grid); border-bottom: 1px solid var(--grid); }
+.quiz-title { margin: 0 0 4px; font-size: 1.05rem; font-weight: 650; }
+.quiz-text { margin: 0 0 10px; color: var(--text-secondary); }
+.quiz-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.quiz .verdict { margin-top: 10px; }
+.quiz .verdict:empty { margin: 0; }
+.verdict.ok { color: var(--success-text); }
+.verdict.bad { color: var(--critical-text); }
+.legend-note:empty { margin: 0; }
+/* The two reflected waves share one style so they merge in step; out of step, colour and this sentence
+   tell them apart (WCAG 1.4.1, technique G14). With no waves drawn it is hidden but keeps its line. */
+.legend-note.is-off { visibility: hidden; }
+@media (min-width: 900px) {
+  html[data-present] .legend-note, html[data-present] .quiz-text { font-size: 1.05rem; }
+}
