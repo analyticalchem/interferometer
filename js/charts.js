@@ -1,4 +1,4 @@
-/* FTIR Interferometer: line charts on canvas. One canvas can hold several panels stacked on a shared
+/* FTIR Interferometer Explorer: line charts on canvas. One canvas can hold several panels stacked on a shared
  * width. Long curves (thousands of points) are drawn one pixel column at a time, from the lowest to the
  * highest value in that column, so fast fringes show as a solid band instead of aliasing.
  * Colours and sizes come from the CSS tokens (refresh). Exposes window.Charts.

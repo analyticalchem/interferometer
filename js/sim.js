@@ -1,4 +1,4 @@
-/* FTIR Interferometer: the moving mirror and the recording, with no DOM.
+/* FTIR Interferometer Explorer: the moving mirror and the recording, with no DOM.
  *
  * The mirror's displacement x (µm) gives a path difference δ = 2x, because the light travels to the
  * mirror and back. The mirror travels from zero path difference (x = 0, the arms equal) to the end of

@@ -1,4 +1,4 @@
-/* FTIR Interferometer: the instrument drawing, inline SVG.
+/* FTIR Interferometer Explorer: the instrument drawing, inline SVG.
  *
  * The instrument is a top view: source, beamsplitter, fixed and movable mirrors, a fold mirror, the
  * sample compartment and the detector. The movable mirror moves in proportion to its true position,

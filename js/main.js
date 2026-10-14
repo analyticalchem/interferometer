@@ -1,4 +1,4 @@
-/* FTIR Interferometer: wiring. Holds the settings, builds the beam for the chosen source and sample,
+/* FTIR Interferometer Explorer: wiring. Holds the settings, builds the beam for the chosen source and sample,
  * moves the mirror and records, transforms the recording, and draws the drawings, charts, lists and
  * tables. Exposes window.app for console checks.
  */
@@ -847,6 +847,8 @@
     ifgChart = Charts.create($('ifg-canvas'));
     specChart = Charts.create($('spec-canvas'));
     sigChart = Charts.create($('signal-canvas'));
+    // A browser may put checkboxes back as they were before a reload; the page starts from its defaults.
+    document.querySelectorAll('input[type="checkbox"]').forEach(function (c) { c.checked = c.defaultChecked; });
     els.instrument = document.querySelector('.instrument');
     els.waveNote = $('wave-note');
     Diagram.init($('diagram'), {

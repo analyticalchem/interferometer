@@ -1,4 +1,4 @@
-/* FTIR Interferometer: the sample library. Each compound is a list of idealized IR absorption bands:
+/* FTIR Interferometer Explorer: the sample library. Each compound is a list of idealized IR absorption bands:
  * centre (cm⁻¹), full width at half height (cm⁻¹), peak absorbance through the cell, the band's
  * shape, and the vibration responsible. Every band is an IR-active mode seen in the liquid (or film,
  * or gas) IR spectrum; widths and heights are rounded, idealized values chosen so the strong bands stay

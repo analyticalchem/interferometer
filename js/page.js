@@ -1,4 +1,4 @@
-/* FTIR Interferometer: page chrome common to every analyticalchem page, copied from the Millikan Oil Drop
+/* FTIR Interferometer Explorer: page chrome common to every analyticalchem page, copied from the Millikan Oil Drop
  * Lab (itself a trimmed copy of the Op Amp Lab page script). The theme button (auto → light → dark,
  * stored per project), presentation mode (Present button, Alt + Shift + P, ?present=1, Escape, leaving
  * fullscreen), a coalesced layout callback on resize, number formatting and subscripts.

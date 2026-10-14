@@ -1,4 +1,4 @@
-/* FTIR Interferometer: this page's own layout, drawing styles, the Key block, the signal chart and
+/* FTIR Interferometer Explorer: this page's own layout, drawing styles, the Key block, the signal chart and
    the transform walkthrough. House tokens and components are in css/styles.css. */
 
 /* ---------- Controls ---------- */
@@ -160,6 +160,10 @@
 
 @media (max-width: 560px) {
   .probe-row { grid-template-columns: minmax(0, 1fr); }
+  /* The probe's readout takes its own line on a phone, always, so it fits with the 1.4.12 text
+     spacing and the panel does not change height as the readout's length changes. */
+  .probe-control .control-head { flex-wrap: wrap; }
+  .probe-control .value-out { flex-basis: 100%; }
 }
 
 /* ---------- Presentation mode ---------- */

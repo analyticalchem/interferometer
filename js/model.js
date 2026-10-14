@@ -1,4 +1,4 @@
-/* FTIR Interferometer: the physics, as pure functions with no DOM.
+/* FTIR Interferometer Explorer: the physics, as pure functions with no DOM.
  *
  * The beam from the source (a broadband infrared source near 1500 K, or one or two single wavelengths) is
  * split, sent to the two mirrors and recombined. With a path difference δ between the arms, each

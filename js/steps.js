@@ -1,4 +1,4 @@
-/* FTIR Interferometer: the Fourier transform, from interferogram to spectrum. One canvas in four
+/* FTIR Interferometer Explorer: the Fourier transform, from interferogram to spectrum. One canvas in four
  * stacked panels: the interferogram (its average subtracted, and windowed if apodization is shown),
  * the probe cosine, their product, and the spectrum built so far, one probe wavenumber at a time by
  * the same sum the FFT does all at once. The background can be overlaid on the spectrum.

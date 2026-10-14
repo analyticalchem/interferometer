@@ -1,4 +1,4 @@
-# FTIR Interferometer
+# FTIR Interferometer Explorer
 
 An interactive teaching page about the Michelson interferometer inside an FTIR spectrometer: how moving the mirror produces an interferogram, and how the Fourier transform turns the interferogram into a spectrum showing which wavelengths a sample absorbs.
 
