@@ -11,11 +11,18 @@ No build step and no dependencies: plain HTML, CSS and JavaScript.
 
 ## Using the page
 
+The page has two pages in one: **Instrument** and **Results**, switched in the header, by *See the results →* and *← Back to the instrument*, or with the browser's Back button (the results page's address ends in `#results`). They follow the same recording, so the results are always those of the experiment on the instrument page, even while a scan runs.
+
+- **Instrument:** the drawing fills the window. A toolbar above it holds the light source, the two wavenumber boxes, the sample, Scan, Go to δ = 0 and Clear Recording; **Settings** opens a drop-down over the drawing with the wavenumber sliders, wavenumber 2's brightness and the recording settings (resolution, speed, noise, scans). The Mirror position slider runs under the drawing, and the Key sits beside or under it, whichever leaves the drawing larger.
+- **Results:** tabs for the Interferogram, the Spectrum, the Absorptions, the Transform and About (the model notes). A line at the top says what is being recorded and how the scan stands.
+
+On a window at least 1100 × 680 px (1280 × 720 when presenting) each page fits the window with no page scroll; a tab with more than fits (About, an opened table) scrolls inside itself, and the card keeps one height so changing tabs never moves the page. On a smaller window, at 200 % zoom or on a phone, each page stacks in one scrolling column. Large screens step the text up (112.5 % from 1600 × 900, 125 % from 2200 × 1200), as on every analyticalchem page.
+
 1. **Choose a light source.** *Single wavelength* (500 to 4000 cm⁻¹, like a laser), *Two wavelengths* (with the second one's brightness); a wavenumber can be set on its slider or typed, in cm⁻¹ or as a wavelength in µm, or *Broadband IR*, every wavenumber from about 450 to 4300 cm⁻¹ (a blackbody source near 1500 K).
 2. **Choose a sample** from the list: the empty holder (the background), hexane, ethanol, acetone, ethyl acetate, acetonitrile, a polystyrene film or carbon dioxide gas, or Unknown A, B or C.
-3. **Move the mirror.** Drag the movable mirror in the drawing, use the Mirror position slider or type a position, or press **Scan**. The mirror travels from zero path difference to the end of its travel, so every displacement is positive. A scan works as a real instrument's does: a new recording, the mirror returned quickly to zero without recording, then one sweep at the chosen speed to the end, recording at every reference-laser fringe. That is a single-sided interferogram; the transform takes the negative side as its mirror image (an ideal interferogram is symmetric), so the spectrum is the same as from both sides. Moving the mirror by hand records every fringe it passes. The Detector Signal chart plots the signal against mirror position as the mirror moves. On a wide screen the drawing fills the panel and the chart sits in its top right corner, beside the interferometer and above the sample compartment; on a narrow one the chart is under the drawing. Changing the source, a wavenumber, the sample, the noise or the resolution starts a new recording.
+3. **Move the mirror.** Drag the movable mirror in the drawing, use the Mirror position slider or type a position, or press **Scan**. The mirror travels from zero path difference to the end of its travel, so every displacement is positive. A scan works as a real instrument's does: a new recording, the mirror returned quickly to zero without recording, then one sweep at the chosen speed to the end, recording at every reference-laser fringe. That is a single-sided interferogram; the transform takes the negative side as its mirror image (an ideal interferogram is symmetric), so the spectrum is the same as from both sides. Moving the mirror by hand records every fringe it passes. The Detector Signal chart plots the signal against mirror position as the mirror moves. On one screen, or a wide stacked page, the chart sits in the drawing's top right corner, beside the interferometer and above the sample compartment; on a narrow one it is under the drawing. Changing the source, a wavenumber, the sample, the noise or the resolution starts a new recording.
 4. **Watch the interferogram build.** View it over the whole scan (the default) or around the mirror (±25 µm of path difference). With two wavelengths, show the two component waves; with a sample, compare with the empty holder.
-5. **Follow the transform.** From Interferogram to Spectrum (closed until opened) shows the Fourier transform in four panels: the interferogram (its average subtracted), a probe cosine, their product, and the spectrum. The spectrum starts whole, as the FFT computes every wavenumber at once; a probe wavenumber multiplies the interferogram by a cosine and adds up the product, the relative product area, which is one point of the spectrum. Sweep rebuilds the spectrum from 400 cm⁻¹ one probe wavenumber at a time, and Clear Points empties it to build by moving the probe. A checkbox overlays the background (the empty holder) on the spectrum; another reveals apodization. The Spectrum panel gives the transmittance, T = I ÷ I₀.
+5. **Follow the transform.** The Transform tab (From Interferogram to Spectrum) shows the Fourier transform in four panels: the interferogram (its average subtracted), a probe cosine, their product, and the spectrum. The spectrum starts whole, as the FFT computes every wavenumber at once; a probe wavenumber multiplies the interferogram by a cosine and adds up the product, the relative product area, which is one point of the spectrum. Sweep rebuilds the spectrum from 400 cm⁻¹ one probe wavenumber at a time, and Clear Points empties it to build by moving the probe. A checkbox overlays the background (the empty holder) on the spectrum; another reveals apodization. The Spectrum panel gives the transmittance, T = I ÷ I₀.
 6. **Read the spectrum.** Transmittance or absorbance against wavenumber or wavelength, with each absorption labelled, the fingerprint region (600 to 1200 cm⁻¹) shaded, and the Absorptions table naming the vibration responsible.
 
 The extras: a **Resolution** setting that sets the mirror's travel and puts the mirror back at zero: 800 or 400 cm⁻¹ (0 to 6.25 or 0 to 12.5 µm, a few fringes of every wavelength, for moving the mirror by hand; spectra are broad) or 4 cm⁻¹ for recording spectra (0 to 1,250 µm, with the speed set to 1,000 µm/s); detector **Noise** with averaging of 1, 4, 16 or 64 scans; and three **unknown** liquids, chosen at random, to identify from their spectra.
@@ -39,14 +46,18 @@ The extras: a **Resolution** setting that sets the mirror's travel and puts the 
 
 ## Presentation mode
 
-Press **Present** or **Alt + Shift + P** (Option + Shift + P on a Mac); Escape leaves it. Add `?present=1` to a link to open it ready to present.
+Press **Present** or **Alt + Shift + P** (Option + Shift + P on a Mac); Escape leaves it (an open Settings drop-down takes the first Escape). Add `?present=1` to a link to open it ready to present, and `#results` to open the results page.
+
+## Releases
+
+Every stylesheet and script link in `index.html` ends in the same `?v=YYYYMMDD-n` tag. Change all of them to a new value in any release that changes a CSS or JS file: GitHub Pages lets browsers reuse cached files for up to 10 minutes, and a new tag makes them fetch the new ones at once.
 
 ## Files
 
 ```
 index.html          page structure and text
 css/styles.css      house tokens (with the instrument drawing's colours), components, themes, presentation mode
-css/page.css        this page: the drawings, Key, charts, the Fourier transform, the extras
+css/page.css        this page: the two pages, toolbar and Settings, the drawings, Key, tabs, charts, the Fourier transform, the extras
 js/page.js          theme, presentation mode, formatting
 js/samples.js       the sample library: bands, widths, heights and assignments
 js/model.js         the physics: source, sample, interferogram, FFT, windows, transform, peak finding, noise
@@ -55,6 +66,7 @@ js/charts.js        line charts on canvas
 js/diagram.js       the instrument drawing (SVG)
 js/steps.js         the Fourier transform, from interferogram to spectrum
 js/main.js          wires the controls, drawings, charts, tables and extras
+js/layout.js        the page's arrangement: the two pages, one screen, the drawing's size, Settings, the tabs
 ```
 
 ## License

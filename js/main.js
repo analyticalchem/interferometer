@@ -119,7 +119,7 @@
       b.setAttribute('aria-pressed', String(b.dataset.source === S.source));
     });
     // Every source control stays in place, switched off when the source does not use it, so the
-    // panel keeps its size and the panels below do not move.
+    // toolbar keeps its size and the drawing does not move.
     var two = S.source === 'two', lines = S.source !== 'broad';
     setUsed($('v1'), lines, 'Not used with Broadband IR, which has every wavenumber');
     setUsed($('v2'), two, 'Used only with Two wavelengths');
@@ -152,6 +152,7 @@
       $(id).setAttribute('aria-valuetext', wnSpeech(S[id]));
       $(id + '-wl').textContent = fmt(1e4 / S[id], 2);
       if (document.activeElement !== box || !box._editing) box.value = String(S[id]);
+      $(id + '-out').textContent = fmt(S[id], 0) + NB + 'cm⁻¹';   // the slider's readout in Settings
     });
     $('ratio-out').textContent = fmt(S.ratio * 100, 0) + NB + '%';
     $('ratio').setAttribute('aria-valuetext', fmt(S.ratio * 100, 0) + ' percent');
@@ -703,7 +704,7 @@
         msg += ' At ' + fmt(sp.res, 0) + NB + 'cm⁻¹ resolution, bands closer together than that blur into one broad dip; choose 4' + NB + 'cm⁻¹ and scan to resolve them.';
       } else if (stray) {
         msg += ' Rows marked “not one of this sample\'s bands” are ' + (S.noise ? 'noise or ' : '') + 'ripples, not absorptions.' +
-          (S.win === 'none' ? ' Ripples beside strong bands come from the abrupt ends of the scan; apodization, under From Interferogram to Spectrum, removes most of them.' : '');
+          (S.win === 'none' ? ' Ripples beside strong bands come from the abrupt ends of the scan; apodization, on the Transform tab of the results, removes most of them.' : '');
       }
     } else {
       head = ['Peak', 'Wavenumber found (cm⁻¹)', 'Wavelength (µm)', 'Set to (cm⁻¹)', 'Relative intensity'];
@@ -802,13 +803,14 @@
   }
 
   /**
-   * The drawing fills the panel. Where the panel is wide enough for the Detector Signal chart to keep a
-   * useful size beside the interferometer, the drawing takes its wide layout and the chart lies over its
-   * clear top right corner; otherwise the drawing keeps its narrow layout with the chart under it.
+   * The drawing fills its box. On one screen (layout.js), or where the box is wide enough for the Detector
+   * Signal chart to keep a useful size beside the interferometer, the drawing takes its wide layout and the
+   * chart lies over its clear top right corner; otherwise the drawing keeps its narrow layout with the
+   * chart under it.
    */
   function placeSignalChart() {
-    var inst = els.instrument, present = document.documentElement.hasAttribute('data-present');
-    var wide = inst.clientWidth >= (present ? 960 : 860);
+    var inst = els.instrument, html = document.documentElement, present = html.hasAttribute('data-present');
+    var wide = html.classList.contains('one-screen') || inst.clientWidth >= (present ? 960 : 860);
     Diagram.setLayout(wide ? 'wide' : 'narrow');
     inst.classList.toggle('overlay', wide);
     var c = Diagram.chartPlace();
@@ -1007,8 +1009,6 @@
       });
     });
     $('spec-table-view').addEventListener('toggle', specTable);
-    // The transform's chart has no size while its panel is closed, so it is laid out when it opens.
-    $('ft-fold').addEventListener('toggle', function () { if (this.open) { Steps.layout(); Steps.refresh(); } });
 
     Page.init({
       themeKey: 'interferometer-theme',

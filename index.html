@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FTIR Interferometer Explorer</title>
-  <meta name="description" content="Move the mirror of the interferometer inside an FTIR spectrometer, record an interferogram for a light source and an infrared-absorbing sample, and watch the Fourier transform build the spectrum that shows which wavelengths the sample absorbs.">
+  <meta name="description" content="Move the mirror of the interferometer inside an FTIR spectrometer, record an interferogram for a light source and an infrared-absorbing sample, and see the Fourier transform build the spectrum that shows which wavelengths the sample absorbs.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20x='2'%20y='15'%20width='22'%20height='3'%20fill='%23eb6834'/%3E%3Crect%20x='14.5'%20y='4'%20width='3'%20height='26'%20fill='%23eb6834'/%3E%3Crect%20x='10'%20y='2'%20width='12'%20height='3'%20fill='%236f6d68'/%3E%3Crect%20x='25'%20y='10'%20width='3'%20height='13'%20fill='%236f6d68'/%3E%3Crect%20x='9'%20y='14.5'%20width='14'%20height='4'%20fill='%232a78d6'%20transform='rotate(-45%2016%2016.5)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/page.css">
+  <!-- ?v= tags: change all of them to a new value with every release so browsers fetch the new files. -->
+  <link rel="stylesheet" href="css/styles.css?v=20261019-1">
+  <link rel="stylesheet" href="css/page.css?v=20261019-1">
   <script>
     // Apply the saved theme before first paint so the page does not flash.
     try {
@@ -28,6 +29,10 @@
         <p class="lede">Move the mirror of the interferometer inside an FTIR spectrometer and record an interferogram, then follow the Fourier transform that turns it into a spectrum showing which wavelengths the sample absorbs.</p>
         <p class="present-hint">Alt + Shift + P toggles · Esc exits</p>
       </div>
+      <nav class="page-nav" aria-label="Pages">
+        <a href="#instrument" id="nav-instrument" aria-current="page">Instrument</a>
+        <a href="#results" id="nav-results">Results</a>
+      </nav>
       <div class="header-actions">
         <button id="theme" class="btn ghost" type="button" title="Switch between automatic, light and dark colors">Theme: auto</button>
         <button id="present" class="btn ghost" type="button" aria-pressed="false" title="Larger text and controls for projecting. Escape exits.">Present</button>
@@ -36,135 +41,141 @@
   </header>
 
   <main id="main">
-    <section class="card controls" aria-labelledby="controls-title">
-      <div class="card-head">
-        <h2 id="controls-title">Instrument Controls</h2>
-        <p class="card-sub">Choose a source and a sample, then move the mirror: drag it in the drawing, use the slider, or press Scan.</p>
-      </div>
+    <!-- Page 1, the instrument: the drawing fills the window; the toolbar above it holds the settings used
+         most and a Settings drop-down the rest, and the mirror's slider runs under the drawing. -->
+    <div class="page page-instrument" id="page-instrument">
+    <section class="card visual-card instrument-card" aria-labelledby="view-title">
+      <h2 id="view-title" class="visually-hidden">The Interferometer</h2>
 
-      <div class="sliders">
-        <div class="control">
-          <p class="label" id="source-label">Light source</p>
-          <div class="chips" role="group" aria-labelledby="source-label">
-            <button type="button" class="chip" data-source="single" aria-pressed="true">Single wavelength</button>
-            <button type="button" class="chip" data-source="two" aria-pressed="false">Two wavelengths</button>
-            <button type="button" class="chip" data-source="broad" aria-pressed="false">Broadband IR</button>
+      <div class="toolbar">
+        <div class="tb-row tb-setup">
+          <div class="tb-item">
+            <span class="tb-label" id="source-label">Light source</span>
+            <div class="chips" role="group" aria-labelledby="source-label" aria-describedby="source-sub">
+              <button type="button" class="chip" data-source="single" aria-pressed="true">Single wavelength</button>
+              <button type="button" class="chip" data-source="two" aria-pressed="false">Two wavelengths</button>
+              <button type="button" class="chip" data-source="broad" aria-pressed="false">Broadband IR</button>
+            </div>
+            <p class="control-sub stack-sub visually-hidden" id="source-sub">
+              <span data-src="single">One wavelength, like a laser</span>
+              <span data-src="two" class="is-off">Two wavelengths shining together</span>
+              <span data-src="broad" class="is-off">Every wavenumber, about 450 to 4,300 cm⁻¹</span>
+            </p>
           </div>
-          <p class="control-sub stack-sub" id="source-sub">
-            <span data-src="single">One wavelength, like a laser</span>
-            <span data-src="two" class="is-off">Two wavelengths shining together</span>
-            <span data-src="broad" class="is-off">Every wavenumber, about 450 to 4,300 cm⁻¹</span>
-          </p>
-        </div>
 
-        <div class="control">
-          <div class="control-head wn-head">
-            <label for="v1">Wavenumber 1</label>
+          <div class="tb-item wn-item">
+            <label class="tb-label" for="v1-num">Wavenumber 1</label>
             <span class="entry"><input class="num wn-num" id="v1-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Wavenumber 1, in reciprocal centimetres" aria-describedby="v1-num-msg"><span class="unit" aria-hidden="true">cm⁻¹</span><span class="wl">· <span class="wl-n" id="v1-wl"></span>&nbsp;µm</span></span>
+            <p class="num-msg tb-msg" id="v1-num-msg" role="alert"></p>
           </div>
-          <input id="v1" type="range" min="500" max="4000" step="10" value="1000" autocomplete="off">
-          <p class="num-msg" id="v1-num-msg" role="alert"></p>
-        </div>
 
-        <div class="control">
-          <div class="control-head wn-head">
-            <label for="v2">Wavenumber 2</label>
+          <div class="tb-item wn-item">
+            <label class="tb-label" for="v2-num">Wavenumber 2</label>
             <span class="entry"><input class="num wn-num" id="v2-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Wavenumber 2, in reciprocal centimetres" aria-describedby="v2-num-msg"><span class="unit" aria-hidden="true">cm⁻¹</span><span class="wl">· <span class="wl-n" id="v2-wl"></span>&nbsp;µm</span></span>
+            <p class="num-msg tb-msg" id="v2-num-msg" role="alert"></p>
           </div>
-          <input id="v2" type="range" min="500" max="4000" step="10" value="2500" autocomplete="off">
-          <p class="num-msg" id="v2-num-msg" role="alert"></p>
+
+          <div class="tb-item">
+            <label class="tb-label" for="sample">Sample</label>
+            <select id="sample" class="sample-select" aria-describedby="sample-sub" autocomplete="off"></select>
+            <p class="control-sub visually-hidden" id="sample-sub"></p>
+          </div>
         </div>
 
-        <div class="control">
-          <div class="control-head">
-            <label for="ratio">Wavenumber 2 brightness</label>
-            <output id="ratio-out" for="ratio"></output>
+        <div class="tb-row tb-run">
+          <div class="mirror-buttons">
+            <button id="scan" class="btn primary scan-btn" type="button">Scan</button>
+            <button id="zero" class="btn" type="button">Go to δ = 0</button>
+            <button id="clear" class="btn" type="button">Clear Recording</button>
           </div>
-          <input id="ratio" type="range" min="0.3" max="1" step="0.05" value="0.6" aria-describedby="ratio-sub" autocomplete="off">
-          <p class="control-sub" id="ratio-sub">30 to 100 % of wavenumber 1; for Two wavelengths</p>
-        </div>
-
-        <div class="control">
-          <div class="control-head">
-            <label for="sample">Sample in the holder</label>
-          </div>
-          <select id="sample" class="sample-select" aria-describedby="sample-sub" autocomplete="off"></select>
-          <p class="control-sub" id="sample-sub"></p>
-        </div>
-
-        <div class="control">
-          <div class="control-head">
-            <label for="mirror">Mirror position</label>
-            <span class="entry"><input class="num" id="mirror-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Mirror position, in micrometres" aria-describedby="mirror-num-msg"><span class="unit" aria-hidden="true">µm</span></span>
-          </div>
-          <input id="mirror" type="range" min="0" max="12.5" step="0.02" value="0" aria-describedby="mirror-sub" autocomplete="off">
-          <p class="num-msg" id="mirror-num-msg" role="alert"></p>
-          <p class="control-sub" id="mirror-sub">0 to 12.5 µm; path difference δ = 2 × position</p>
+          <p id="scan-status" class="run-status scan-status" role="status"></p>
+          <details class="settings" id="settings">
+            <summary class="btn">Settings</summary>
+            <div class="settings-panel">
+              <div class="settings-group">
+                <h3 class="info-title">Wavenumbers</h3>
+                <div class="control">
+                  <div class="control-head">
+                    <label for="v1">Wavenumber 1</label>
+                    <output class="wn-out" id="v1-out" for="v1"></output>
+                  </div>
+                  <input id="v1" type="range" min="500" max="4000" step="10" value="1000" autocomplete="off">
+                </div>
+                <div class="control">
+                  <div class="control-head">
+                    <label for="v2">Wavenumber 2</label>
+                    <output class="wn-out" id="v2-out" for="v2"></output>
+                  </div>
+                  <input id="v2" type="range" min="500" max="4000" step="10" value="2500" autocomplete="off">
+                </div>
+                <div class="control">
+                  <div class="control-head">
+                    <label for="ratio">Wavenumber 2 brightness</label>
+                    <output id="ratio-out" for="ratio"></output>
+                  </div>
+                  <input id="ratio" type="range" min="0.3" max="1" step="0.05" value="0.6" aria-describedby="ratio-sub" autocomplete="off">
+                  <p class="control-sub" id="ratio-sub">30 to 100 % of wavenumber 1; for Two wavelengths</p>
+                </div>
+              </div>
+              <div class="settings-group">
+                <h3 class="info-title">Recording</h3>
+                <div class="option-group">
+                  <span class="option-label" id="res-label">Resolution (cm⁻¹)</span>
+                  <div class="chips" role="group" aria-labelledby="res-label">
+                    <button type="button" class="chip" data-res="800" aria-pressed="false">800</button>
+                    <button type="button" class="chip" data-res="400" aria-pressed="true">400</button>
+                    <button type="button" class="chip" data-res="4" aria-pressed="false" title="For recording spectra: the mirror travels from 0 to 1,250 µm">4</button>
+                  </div>
+                </div>
+                <label class="select">Speed
+                  <select id="speed" autocomplete="off">
+                    <option value="0.5">0.5 µm/s</option>
+                    <option value="2">2 µm/s</option>
+                    <option value="10" selected>10 µm/s</option>
+                    <option value="50">50 µm/s</option>
+                    <option value="250">250 µm/s</option>
+                    <option value="1000">1,000 µm/s</option>
+                  </select>
+                </label>
+                <label class="check"><input type="checkbox" id="noise-on"> Noise</label>
+                <div class="option-group">
+                  <span class="option-label" id="scans-label">Scans</span>
+                  <div class="chips" role="group" aria-label="Scans averaged">
+                    <button type="button" class="chip" data-scans="1" aria-pressed="true">1</button>
+                    <button type="button" class="chip" data-scans="4" aria-pressed="false">4</button>
+                    <button type="button" class="chip" data-scans="16" aria-pressed="false">16</button>
+                    <button type="button" class="chip" data-scans="64" aria-pressed="false">64</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+          <a class="btn go-results" href="#results">See the results<span aria-hidden="true"> →</span></a>
         </div>
       </div>
 
-      <div class="run-row">
-        <button id="scan" class="btn primary scan-btn" type="button">Scan</button>
-        <button id="zero" class="btn" type="button">Go to δ = 0</button>
-        <button id="clear" class="btn" type="button">Clear Recording</button>
-        <label class="select">Speed
-          <select id="speed" autocomplete="off">
-            <option value="0.5">0.5 µm/s</option>
-            <option value="2">2 µm/s</option>
-            <option value="10" selected>10 µm/s</option>
-            <option value="50">50 µm/s</option>
-            <option value="250">250 µm/s</option>
-            <option value="1000">1,000 µm/s</option>
-          </select>
-        </label>
-        <div class="option-group">
-          <span class="option-label" id="res-label">Resolution (cm⁻¹)</span>
-          <div class="chips" role="group" aria-labelledby="res-label">
-            <button type="button" class="chip" data-res="800" aria-pressed="false">800</button>
-            <button type="button" class="chip" data-res="400" aria-pressed="true">400</button>
-            <button type="button" class="chip" data-res="4" aria-pressed="false" title="For recording spectra: the mirror travels from 0 to 1,250 µm">4</button>
+      <div class="drawing-fit">
+        <div class="instrument">
+          <div class="visual-scroll diagram-box">
+            <svg id="diagram" class="schem diagram-svg" viewBox="0 0 760 470" role="img" aria-labelledby="diagram-title diagram-desc">
+              <title id="diagram-title">Drawing of the interferometer in an FTIR spectrometer</title>
+              <desc id="diagram-desc">A top view. Light from the infrared source on the left meets a beamsplitter set at 45 degrees. Half goes up to a fixed mirror and half goes right to a movable mirror on a track. The halves return to the beamsplitter, recombine and travel down and then right through the sample compartment to the detector, which has a signal bar beside it. With one or two wavelengths the beam is drawn as its wave: a thin dark wave going out to each mirror, orange reflected from the fixed mirror and blue from the movable mirror, each overlapping the outgoing wave in its arm. Orange and blue carry on through the beamsplitter to the detector, in step or opposite depending on the mirror; moving the mirror shifts only the blue wave, in the direction the mirror moves. The movable mirror can be dragged along its track. The Detector Signal chart beside the drawing plots the signal against the mirror's position.</desc>
+            </svg>
           </div>
-        </div>
-        <label class="check"><input type="checkbox" id="noise-on"> Noise</label>
-        <div class="option-group">
-          <span class="option-label" id="scans-label">Scans</span>
-          <div class="chips" role="group" aria-label="Scans averaged">
-            <button type="button" class="chip" data-scans="1" aria-pressed="true">1</button>
-            <button type="button" class="chip" data-scans="4" aria-pressed="false">4</button>
-            <button type="button" class="chip" data-scans="16" aria-pressed="false">16</button>
-            <button type="button" class="chip" data-scans="64" aria-pressed="false">64</button>
+          <div class="signal-box">
+            <h3 class="signal-title" id="signal-heading">Detector signal</h3>
+            <div class="visual chart-visual signal-visual">
+              <canvas id="signal-canvas" role="img" aria-label="Detector signal in percent against mirror position in micrometres, drawn as the mirror moves. The recorded values are in the interferogram table, where the path difference is twice the mirror position."></canvas>
+            </div>
+            <ul class="legend" role="list">
+              <li class="lg"><span class="lg-key" style="--key: var(--series-c)" aria-hidden="true"></span><span>Recorded signal</span></li>
+              <li class="lg"><span class="lg-dot" style="--key: var(--text-primary)" aria-hidden="true"></span><span>The mirror now</span></li>
+            </ul>
           </div>
         </div>
       </div>
-      <p id="scan-status" class="run-status scan-status" role="status"></p>
-    </section>
 
-    <section class="card visual-card" aria-labelledby="view-title">
-      <div class="card-head">
-        <h2 id="view-title">The Interferometer</h2>
-        <p class="card-sub">Top view. The beamsplitter sends half of the light to the fixed mirror and half to the movable mirror; the halves come back, recombine and travel through the sample to the detector.</p>
-      </div>
-      <div class="instrument">
-        <div class="visual-scroll diagram-box">
-          <svg id="diagram" class="schem diagram-svg" viewBox="0 0 760 470" role="img" aria-labelledby="diagram-title diagram-desc">
-            <title id="diagram-title">Drawing of the interferometer in an FTIR spectrometer</title>
-            <desc id="diagram-desc">A top view. Light from the infrared source on the left meets a beamsplitter set at 45 degrees. Half goes up to a fixed mirror and half goes right to a movable mirror on a track. The halves return to the beamsplitter, recombine and travel down and then right through the sample compartment to the detector, which has a signal bar beside it. With one or two wavelengths the beam is drawn as its wave: a thin dark wave going out to each mirror, orange reflected from the fixed mirror and blue from the movable mirror, each overlapping the outgoing wave in its arm. Orange and blue carry on through the beamsplitter to the detector, in step or opposite depending on the mirror; moving the mirror shifts only the blue wave, in the direction the mirror moves. The movable mirror can be dragged along its track. The Detector Signal chart beside the drawing plots the signal against the mirror's position.</desc>
-          </svg>
-        </div>
-        <div class="signal-box">
-          <h3 class="signal-title" id="signal-heading">Detector signal</h3>
-          <div class="visual chart-visual signal-visual">
-            <canvas id="signal-canvas" role="img" aria-label="Detector signal in percent against mirror position in micrometres, drawn as the mirror moves. The recorded values are in the interferogram table, where the path difference is twice the mirror position."></canvas>
-          </div>
-          <ul class="legend" role="list">
-            <li class="lg"><span class="lg-key" style="--key: var(--series-c)" aria-hidden="true"></span><span>Recorded signal</span></li>
-            <li class="lg"><span class="lg-dot" style="--key: var(--text-primary)" aria-hidden="true"></span><span>The mirror now</span></li>
-          </ul>
-        </div>
-      </div>
-      <p class="scale-note">Not to scale.</p>
-
-      <div class="info-block">
+      <div class="info-block drawing-key">
         <h3 class="info-title">Key<span class="visually-hidden"> to the interferometer drawing</span></h3>
         <ul class="legend" role="list">
           <li class="lg"><span class="lg-key" style="--key: var(--text-primary)" aria-hidden="true"></span><span>Light going out from the source to the mirrors</span></li>
@@ -173,251 +184,288 @@
           <li class="lg"><span class="lg-key thick" style="--key: var(--accent)" aria-hidden="true"></span><span>Signal bar: full height is the empty holder at zero path difference</span></li>
         </ul>
         <p class="legend-note" id="wave-note">Below the beamsplitter, the wave that shifts as the mirror moves came from the movable mirror.</p>
+        <p class="scale-note">Not to scale.</p>
+      </div>
+
+      <div class="mirror-bar">
+        <div class="control-head">
+          <label for="mirror">Mirror position</label>
+          <span class="entry"><input class="num" id="mirror-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Mirror position, in micrometres" aria-describedby="mirror-num-msg"><span class="unit" aria-hidden="true">µm</span></span>
+        </div>
+        <input id="mirror" type="range" min="0" max="12.5" step="0.02" value="0" aria-describedby="mirror-sub" autocomplete="off">
+        <p class="control-sub" id="mirror-sub">0 to 12.5 µm; path difference δ = 2 × position</p>
+        <p class="num-msg tb-msg" id="mirror-num-msg" role="alert"></p>
       </div>
     </section>
+    </div>
 
-    <section class="card chart-card" aria-labelledby="ifg-title">
-      <div class="card-head">
-        <h2 id="ifg-title">Interferogram</h2>
+    <!-- Page 2, the results: everything computed from the recording, one tab at a time. Same document, so
+         it is always the recording the instrument is making now, even while a scan runs. -->
+    <div class="page page-results" id="page-results" hidden>
+    <div class="card chart-card results-card">
+      <div class="results-head">
+        <p class="results-now" id="results-now" role="status"></p>
+        <a class="btn go-instrument" href="#instrument"><span aria-hidden="true">← </span>Back to the instrument</a>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Results">
+        <button type="button" class="tab" role="tab" id="tab-ifg" aria-controls="panel-ifg" aria-selected="true">Interferogram</button>
+        <button type="button" class="tab" role="tab" id="tab-spec" aria-controls="panel-spec" aria-selected="false" tabindex="-1">Spectrum</button>
+        <button type="button" class="tab" role="tab" id="tab-abs" aria-controls="panel-abs" aria-selected="false" tabindex="-1">Absorptions</button>
+        <button type="button" class="tab" role="tab" id="tab-ft" aria-controls="panel-ft" aria-selected="false" tabindex="-1">Transform</button>
+        <button type="button" class="tab" role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About</button>
+      </div>
+
+      <div class="tab-panel" role="tabpanel" id="panel-ifg" aria-labelledby="tab-ifg" tabindex="0">
+        <h2 id="ifg-title" class="visually-hidden">Interferogram</h2>
         <p class="card-sub">The detector signal against the path difference δ, recorded as the mirror moves. The filled dot is the mirror now.</p>
-      </div>
-      <div class="chart-options">
-        <div class="option-group">
-          <span class="option-label" id="ifg-view-label">View</span>
-          <div class="chips" role="group" aria-labelledby="ifg-view-label">
-            <button type="button" class="chip" data-ifg-view="full" aria-pressed="true">Whole scan</button>
-            <button type="button" class="chip" data-ifg-view="mirror" aria-pressed="false">Around the mirror (±25 µm)</button>
+        <div class="chart-options">
+          <div class="option-group">
+            <span class="option-label" id="ifg-view-label">View</span>
+            <div class="chips" role="group" aria-labelledby="ifg-view-label">
+              <button type="button" class="chip" data-ifg-view="full" aria-pressed="true">Whole scan</button>
+              <button type="button" class="chip" data-ifg-view="mirror" aria-pressed="false">Around the mirror (±25 µm)</button>
+            </div>
           </div>
+          <label class="check"><input type="checkbox" id="ifg-fit"> Stretch the vertical scale to fit</label>
+          <label class="check"><input type="checkbox" id="ifg-components"> Show the two components</label>
+          <label class="check"><input type="checkbox" id="ifg-compare"> Compare with the empty holder</label>
         </div>
-        <label class="check"><input type="checkbox" id="ifg-fit"> Stretch the vertical scale to fit</label>
-        <label class="check"><input type="checkbox" id="ifg-components"> Show the two components</label>
-        <label class="check"><input type="checkbox" id="ifg-compare"> Compare with the empty holder</label>
-      </div>
-      <div class="visual chart-visual ifg-visual">
-        <canvas id="ifg-canvas" role="img" aria-label="Interferogram: detector signal in percent against path difference in micrometres. The values are in the table below the chart."></canvas>
-      </div>
-      <ul class="legend" role="list" id="ifg-legend">
-        <li class="lg"><span class="lg-key" style="--key: var(--series-c)" aria-hidden="true"></span><span>Recorded signal</span></li>
-        <li class="lg"><span class="lg-dot" style="--key: var(--text-primary)" aria-hidden="true"></span><span>The mirror now</span></li>
-        <li class="lg" id="lg-ifg-comp1" hidden><span class="lg-key dashed" style="--key: var(--series-a)" aria-hidden="true"></span><span>Wavenumber 1 alone</span></li>
-        <li class="lg" id="lg-ifg-comp2" hidden><span class="lg-key dotted" style="--key: var(--series-d)" aria-hidden="true"></span><span>Wavenumber 2 alone</span></li>
-        <li class="lg" id="lg-ifg-bg" hidden><span class="lg-key dashdot" style="--key: var(--text-secondary)" aria-hidden="true"></span><span>Empty holder over the same stretch</span></li>
-      </ul>
-      <p class="chart-scale" id="ifg-scale"></p>
-      <details class="table-view" id="ifg-table-view">
-        <summary>Show the interferogram as a table</summary>
-        <p class="table-note" id="ifg-table-note"></p>
-        <div class="table-scroll">
-          <table id="ifg-table">
-            <caption class="visually-hidden">Recorded interferogram</caption>
-            <thead><tr><th scope="col">Path difference, δ (µm)</th><th scope="col">Detector signal (%)</th></tr></thead>
-            <tbody></tbody>
-          </table>
+        <div class="visual chart-visual ifg-visual">
+          <canvas id="ifg-canvas" role="img" aria-label="Interferogram: detector signal in percent against path difference in micrometres. The values are in the table below the chart."></canvas>
         </div>
-      </details>
-    </section>
-
-    <section class="card chart-card" aria-labelledby="ft-title">
-      <details class="fold" id="ft-fold">
-      <summary><h2 id="ft-title">From Interferogram to Spectrum</h2></summary>
-      <div class="card-head">
-        <p class="card-sub">The Fourier transform turns the interferogram you recorded into a spectrum, one wavenumber at a time.</p>
-      </div>
-      <div class="ft-text">
-        <p>For each wavenumber, the transform asks how much of the interferogram is a cosine wave of that wavenumber. Multiply the interferogram by cos(2πν̃δ) and add up the product over the whole scan. Where the two keep in step, the product stays positive and the sum is large; where they drift in and out of step, the positive and negative parts cancel. Each sum, the relative product area, is one point of the spectrum: the green bar at the probe in the bottom panel is as tall as that sum. The spectrum starts whole, as the fast Fourier transform (FFT) computes every wavenumber at once; Sweep builds it again from 400 cm⁻¹, one probe wavenumber at a time, and Clear Points empties it so you can build it by moving the probe.</p>
-        <p>The interferogram here is the recording with its average level subtracted, so it is centred on zero; only the part that goes up and down carries information about wavenumbers. The mirror records only positive path differences, from zero to the end of its travel, and the product's area is taken over that range. An interferogram is symmetric about zero path difference, so the negative side would only add the same area again, and dividing by the background cancels that doubling.</p>
-      </div>
-      <label class="check apod-check"><input type="checkbox" id="show-apod"> Show apodization</label>
-      <div class="ft-text apod-block" id="apod-block" hidden>
-        <p>The recording stops abruptly at the ends of the scan. In the spectrum, that sudden edge puts ripples on both sides of every sharp line. Multiplying the interferogram by a window that falls smoothly to zero at the ends (apodization, “removing the feet”) removes most of the ripples, at the cost of somewhat wider lines. The window is drawn dotted around the interferogram; compare the peaks in the spectrum with each window.</p>
-        <div class="option-group">
-          <span class="option-label" id="win-label">Window</span>
-          <div class="chips" role="group" aria-labelledby="win-label">
-            <button type="button" class="chip" data-win="none" aria-pressed="true">None</button>
-            <button type="button" class="chip" data-win="triangular" aria-pressed="false">Triangular</button>
-            <button type="button" class="chip" data-win="happ-genzel" aria-pressed="false">Happ-Genzel</button>
+        <ul class="legend" role="list" id="ifg-legend">
+          <li class="lg"><span class="lg-key" style="--key: var(--series-c)" aria-hidden="true"></span><span>Recorded signal</span></li>
+          <li class="lg"><span class="lg-dot" style="--key: var(--text-primary)" aria-hidden="true"></span><span>The mirror now</span></li>
+          <li class="lg" id="lg-ifg-comp1" hidden><span class="lg-key dashed" style="--key: var(--series-a)" aria-hidden="true"></span><span>Wavenumber 1 alone</span></li>
+          <li class="lg" id="lg-ifg-comp2" hidden><span class="lg-key dotted" style="--key: var(--series-d)" aria-hidden="true"></span><span>Wavenumber 2 alone</span></li>
+          <li class="lg" id="lg-ifg-bg" hidden><span class="lg-key dashdot" style="--key: var(--text-secondary)" aria-hidden="true"></span><span>Empty holder over the same stretch</span></li>
+        </ul>
+        <p class="chart-scale" id="ifg-scale"></p>
+        <details class="table-view" id="ifg-table-view">
+          <summary>Show the interferogram as a table</summary>
+          <p class="table-note" id="ifg-table-note"></p>
+          <div class="table-scroll">
+            <table id="ifg-table">
+              <caption class="visually-hidden">Recorded interferogram</caption>
+              <thead><tr><th scope="col">Path difference, δ (µm)</th><th scope="col">Detector signal (%)</th></tr></thead>
+              <tbody></tbody>
+            </table>
           </div>
-        </div>
+        </details>
       </div>
-      <div class="probe-row">
-        <div class="control probe-control">
-          <div class="control-head">
-            <label for="probe">Probe wavenumber</label>
-            <span id="probe-out" class="value-out"></span>
-          </div>
-          <input id="probe" type="range" min="400" max="4000" step="1" value="1000" aria-describedby="probe-sub" autocomplete="off">
-          <p class="control-sub" id="probe-sub">400 to 4000 cm⁻¹; every wavenumber the probe passes adds its point to the spectrum</p>
-        </div>
-        <div class="probe-buttons">
-          <button id="sweep" class="btn primary" type="button">Sweep</button>
-          <button id="fft-all" class="btn" type="button">Transform All (FFT)</button>
-          <button id="clear-points" class="btn" type="button">Clear Points</button>
-        </div>
-      </div>
-      <dl class="state-list probe-list">
-        <div><dt>Relative product area</dt><dd id="probe-sum"></dd></div>
-        <div><dt>Spectrum points</dt><dd id="probe-count"></dd></div>
-      </dl>
 
-      <div class="step-options" id="step-zoom-row">
-        <span class="option-label" id="step-zoom-label">View</span>
-        <div class="chips" role="group" aria-labelledby="step-zoom-label">
-          <button type="button" class="chip" data-step-zoom="near" aria-pressed="true">Near zero path difference (0 to 40 µm)</button>
-          <button type="button" class="chip" data-step-zoom="whole" aria-pressed="false">Whole scan</button>
-        </div>
-      </div>
-      <div class="visual chart-visual step-visual" id="step-visual">
-        <canvas id="step-canvas" role="img" aria-label="The Fourier transform at the probe wavenumber. The values are in the tables below the chart."></canvas>
-      </div>
-      <label class="check bg-check"><input type="checkbox" id="show-bg"> Overlay the background on the spectrum (the empty holder)</label>
-      <ul class="legend" role="list" id="step-legend"></ul>
-      <p class="run-status" id="step-status" role="status"></p>
-      <details class="table-view" id="step-table-view">
-        <summary>Show the interferogram, probe cosine and product as a table</summary>
-        <p class="table-note" id="step-table-note"></p>
-        <div class="table-scroll">
-          <table id="step-table">
-            <caption class="visually-hidden" id="step-table-caption">Values for the Fourier transform at the probe wavenumber</caption>
-            <thead><tr><th scope="col">Path difference, δ (µm)</th><th scope="col">Interferogram (% points)</th><th scope="col">Probe cosine</th><th scope="col">Product</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </details>
-      <details class="table-view" id="ft-spec-table-view">
-        <summary>Show the spectrum so far and the background as a table</summary>
-        <p class="table-note" id="ft-spec-table-note"></p>
-        <div class="table-scroll">
-          <table id="ft-spec-table">
-            <caption class="visually-hidden">The spectrum built so far and the background</caption>
-            <thead><tr><th scope="col">Wavenumber (cm⁻¹)</th><th scope="col">Wavelength (µm)</th><th scope="col">Relative product area (spectrum so far)</th><th scope="col">Background (relative)</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </details>
-      </details>
-    </section>
-
-    <section class="card chart-card" aria-labelledby="spec-title">
-      <div class="card-head">
-        <h2 id="spec-title">Spectrum</h2>
-        <p class="card-sub" id="spec-sub">The finished spectrum. Each absorption is marked with its wavenumber; the Absorptions table names the vibration responsible.</p>
+      <div class="tab-panel" role="tabpanel" id="panel-spec" aria-labelledby="tab-spec" tabindex="0" hidden>
+        <h2 id="spec-title" class="visually-hidden">Spectrum</h2>
+        <p class="card-sub" id="spec-sub">The finished spectrum. Each absorption is marked with its wavenumber; the Absorptions tab names the vibration responsible.</p>
         <p class="card-sub"><strong>Simulated:</strong> idealized bands placed at the positions found in reference IR spectra, not a measured spectrum.</p>
-      </div>
-      <div class="chart-options">
-        <div class="option-group">
-          <span class="option-label" id="axis-label">Plot against</span>
-          <div class="chips" role="group" aria-labelledby="axis-label">
-            <button type="button" class="chip" data-axis="wn" aria-pressed="true">Wavenumber (cm⁻¹)</button>
-            <button type="button" class="chip" data-axis="wl" aria-pressed="false">Wavelength (µm)</button>
+        <div class="chart-options">
+          <div class="option-group">
+            <span class="option-label" id="axis-label">Plot against</span>
+            <div class="chips" role="group" aria-labelledby="axis-label">
+              <button type="button" class="chip" data-axis="wn" aria-pressed="true">Wavenumber (cm⁻¹)</button>
+              <button type="button" class="chip" data-axis="wl" aria-pressed="false">Wavelength (µm)</button>
+            </div>
+          </div>
+          <div class="option-group">
+            <span class="option-label" id="ymode-label">Show</span>
+            <div class="chips" role="group" aria-labelledby="ymode-label">
+              <button type="button" class="chip" data-ymode="T" aria-pressed="true">Transmittance</button>
+              <button type="button" class="chip" data-ymode="A" aria-pressed="false">Absorbance</button>
+            </div>
           </div>
         </div>
-        <div class="option-group">
-          <span class="option-label" id="ymode-label">Show</span>
-          <div class="chips" role="group" aria-labelledby="ymode-label">
-            <button type="button" class="chip" data-ymode="T" aria-pressed="true">Transmittance</button>
-            <button type="button" class="chip" data-ymode="A" aria-pressed="false">Absorbance</button>
-          </div>
+        <div class="visual chart-visual spec-visual">
+          <canvas id="spec-canvas" role="img" aria-label="Infrared spectrum. The absorptions are listed in the Absorptions table and the values are in the table below the chart."></canvas>
         </div>
+        <ul class="legend" role="list" id="spec-legend"></ul>
+        <p class="chart-scale" id="noise-readout"></p>
+        <details class="table-view" id="spec-table-view">
+          <summary>Show the spectrum as a table</summary>
+          <p class="table-note" id="spec-table-note"></p>
+          <div class="table-scroll">
+            <table id="spec-table">
+              <caption class="visually-hidden">Spectrum every 10 cm⁻¹</caption>
+              <thead><tr><th scope="col">Wavenumber (cm⁻¹)</th><th scope="col">Wavelength (µm)</th><th scope="col">Relative intensity</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
       </div>
-      <div class="visual chart-visual spec-visual">
-        <canvas id="spec-canvas" role="img" aria-label="Infrared spectrum. The absorptions are listed in the Absorptions table and the values are in the table below the chart."></canvas>
-      </div>
-      <ul class="legend" role="list" id="spec-legend"></ul>
-      <p class="chart-scale" id="noise-readout"></p>
-      <details class="table-view" id="spec-table-view">
-        <summary>Show the spectrum as a table</summary>
-        <p class="table-note" id="spec-table-note"></p>
+
+      <div class="tab-panel results" role="tabpanel" id="panel-abs" aria-labelledby="tab-abs" tabindex="0" hidden>
+        <h2 id="abs-title" class="visually-hidden">Absorptions</h2>
+        <p class="card-sub"><strong>Simulated:</strong> these absorptions are found in the simulated spectrum. Its bands are idealized versions of those in reference IR spectra; a measured spectrum has more bands, with different shapes and heights.</p>
+        <p class="verdict" id="abs-status" role="status"></p>
+        <div class="quiz" id="quiz" hidden>
+          <h3 class="quiz-title" id="quiz-title">Identify the unknown</h3>
+          <p class="quiz-text">The unknown is one of the five liquids. Use the absorptions below, and the vibrations responsible, to decide which.</p>
+          <div class="quiz-row">
+            <label class="select">Your answer
+              <select id="quiz-answer" autocomplete="off">
+                <option value="">Choose a compound</option>
+              </select>
+            </label>
+            <button id="quiz-check" class="btn primary" type="button">Check Answer</button>
+            <button id="quiz-reveal" class="btn" type="button">Reveal</button>
+            <button id="quiz-new" class="btn" type="button">New Unknowns</button>
+          </div>
+          <p class="verdict" id="quiz-status" role="status"></p>
+        </div>
         <div class="table-scroll">
-          <table id="spec-table">
-            <caption class="visually-hidden">Spectrum every 10 cm⁻¹</caption>
-            <thead><tr><th scope="col">Wavenumber (cm⁻¹)</th><th scope="col">Wavelength (µm)</th><th scope="col">Relative intensity</th></tr></thead>
+          <table id="abs-table">
+            <caption class="visually-hidden" id="abs-caption">Absorptions found in the spectrum</caption>
+            <thead><tr><th scope="col">Wavenumber (cm⁻¹)</th><th scope="col">Wavelength (µm)</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-      </details>
-    </section>
-
-    <section class="card results" aria-labelledby="abs-title">
-      <h2 id="abs-title">Absorptions</h2>
-      <p class="card-sub"><strong>Simulated:</strong> these absorptions are found in the simulated spectrum. Its bands are idealized versions of those in reference IR spectra; a measured spectrum has more bands, with different shapes and heights.</p>
-      <p class="verdict" id="abs-status" role="status"></p>
-      <div class="quiz" id="quiz" hidden>
-        <h3 class="quiz-title" id="quiz-title">Identify the unknown</h3>
-        <p class="quiz-text">The unknown is one of the five liquids. Use the absorptions below, and the vibrations responsible, to decide which.</p>
-        <div class="quiz-row">
-          <label class="select">Your answer
-            <select id="quiz-answer" autocomplete="off">
-              <option value="">Choose a compound</option>
-            </select>
-          </label>
-          <button id="quiz-check" class="btn primary" type="button">Check Answer</button>
-          <button id="quiz-reveal" class="btn" type="button">Reveal</button>
-          <button id="quiz-new" class="btn" type="button">New Unknowns</button>
-        </div>
-        <p class="verdict" id="quiz-status" role="status"></p>
+        <p class="hint" id="abs-hint">Bands are found where the transmittance dips at least 4 percentage points below the ground on both sides. With detector noise on, a dip must also stand well clear of the noise, which is largest where the source is dim.</p>
       </div>
-      <div class="table-scroll">
-        <table id="abs-table">
-          <caption class="visually-hidden" id="abs-caption">Absorptions found in the spectrum</caption>
-          <thead><tr><th scope="col">Wavenumber (cm⁻¹)</th><th scope="col">Wavelength (µm)</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <p class="hint" id="abs-hint">Bands are found where the transmittance dips at least 4 percentage points below the ground on both sides. With detector noise on, a dip must also stand well clear of the noise, which is largest where the source is dim.</p>
-    </section>
 
-    <section class="card notes" aria-labelledby="notes-title">
-      <details>
-        <summary><h2 id="notes-title">About the Model</h2></summary>
-        <div class="notes-body">
-          <h3>The interferometer</h3>
-          <p>A Michelson interferometer splits the beam in two at the beamsplitter. One half goes to a fixed mirror and the other to a mirror that moves; both come back and recombine. If the movable mirror is a distance <em>x</em> further away than the fixed one, its half travels an extra 2<em>x</em>, the path difference δ = 2<em>x</em>. Light of wavenumber ν̃ (wavelength λ = 1/ν̃) arrives in step when δ is a whole number of wavelengths and opposite when it is a whole number plus a half, so its brightness at the detector is ½<em>B</em>(ν̃)[1 + cos 2πν̃δ]. The detector adds up every wavenumber in the beam. That sum, plotted against δ, is the interferogram.</p>
-          <p>Changing the light source, a wavenumber, the sample, the noise or the resolution starts a new recording, so the signal is drawn again as the mirror moves. At zero path difference every wavenumber is in step, so the signal is largest there: the centerburst. Away from it, the different wavenumbers fall in and out of step at different rates and mostly cancel, and the signal settles near half its largest value. A sample in the beam removes light at the wavenumbers it absorbs, which changes the interferogram slightly everywhere.</p>
-
-          <h3>Transform and transmittance</h3>
-          <p>The spectrum is recovered with the cosine Fourier transform, <em>B</em>(ν̃) ∝ Σ <em>I</em>(δ) cos(2πν̃δ), summed over every recorded δ after the average is subtracted. The From Interferogram to Spectrum panel does this one wavenumber at a time; the fast Fourier transform (FFT) does all of them at once. The interferogram is padded with zeros to 32,768 points before the FFT, which spaces the spectrum's points about 0.48 cm⁻¹ apart without adding any detail.</p>
-          <p>Transmittance is the sample's single-beam spectrum divided by the background (the same scan with the holder empty), T = I ÷ I<sub>0</sub>, and absorbance is A = −log<sub>10</sub> T. Wavelength and wavenumber are related by λ (µm) = 10,000 ÷ ν̃ (cm⁻¹).</p>
-
-          <h3>Sampling and resolution</h3>
-          <p>A real instrument reads the detector each time a helium–neon reference laser's interference fringe passes, every 0.6328 µm of path difference. The page does the same, so the highest wavenumber the transform can report is 1 ÷ (2 × 0.6328 µm), about 7,900 cm⁻¹, comfortably above the 4,000 cm⁻¹ shown. Two lines closer together than about 1 ÷ δ<sub>max</sub> cannot be told apart, where δ<sub>max</sub> is the largest path difference recorded. The Resolution setting chooses the mirror's travel to match, and puts the mirror back at zero path difference: 0 to 6.25 µm at 800 cm⁻¹ and 0 to 12.5 µm at 400 cm⁻¹, enough to watch the longest wavelength (20 µm) go through its interference cycles, and short enough for the slider to move smoothly through every fringe. Travels this short give broad spectra: bands closer together than the resolution merge into one. For recording spectra, 4 cm⁻¹ moves the mirror from 0 to 1,250 µm, δ<sub>max</sub> = 0.25 cm, as a laboratory FTIR does; choosing it sets the mirror speed to 1,000 µm/s so a scan takes a few seconds, and choosing a low resolution again puts the speed back.</p>
-
-          <h3>Noise and averaging</h3>
-          <p>With Noise on, each reading gets random detector noise of 0.04 % of the largest signal, and averaging n scans divides it by √n, so 4 scans halve the noise and 64 scans cut it eightfold. Because a scan takes so little time, an FTIR can average many scans in the time a dispersive instrument takes for one; this is the multiplex advantage. The background is taken as noise-free, so all the noise in the transmittance comes from the sample's scan. The noise figure under the Spectrum is the difference from the same transform without noise. With noise, the Absorptions table lists a dip only where it stands at least seven times the noise clear of its surroundings and of 100 %: noise alone makes dips four or five times its size many times across a spectrum, but almost never seven. One scan at 4 cm⁻¹ is noisy enough to hide the weaker bands; averaging 16 scans brings nearly all of them out.</p>
-
-          <h3>Unknowns</h3>
-          <p>Unknown A, B and C are three of the five liquids, chosen at random each time the page loads or New Unknowns is pressed. They are drawn as liquid cells, so the holder gives nothing away.</p>
-
-          <h3>Simplifications</h3>
-          <ul>
-            <li>The interferogram is ideal unless Noise is on: no stray light, a perfect 50:50 beamsplitter, and a mirror that moves perfectly straight.</li>
-            <li>The broadband source is a blackbody at 1,500 K, cut off below about 440 cm⁻¹ and above about 4,300 cm⁻¹ by the beamsplitter and detector.</li>
-            <li>Each sample's spectrum is a set of idealized IR bands at the positions found in reference IR spectra of the liquid, film or gas, with rounded widths and heights; Raman-only vibrations are left out. Liquids are drawn as thin films between potassium bromide (KBr) windows, which pass infrared down to 400 cm⁻¹, polystyrene as a film on a card, and carbon dioxide as a gas cell; each carbon dioxide band is drawn as one smooth band, without the rotational structure a real gas shows.</li>
-            <li>The fingerprint region is shaded from 600 to 1,200 cm⁻¹.</li>
-            <li>Scan works as a real instrument does: each scan is a new recording; the mirror returns quickly to zero path difference without recording, then sweeps at constant speed to the end of its travel, read at every reference-laser fringe. The mirror's travel starts at zero path difference, so the recording is one side of the interferogram (single-sided); an ideal interferogram is symmetric, so the transform takes the other side as its mirror image and the spectrum is the same as from both sides. A real instrument's interferogram is slightly lopsided, from small phase errors in the beamsplitter and electronics, so an instrument recording one side also records a short stretch on the other side of zero and uses it to correct them; this idealized model has no phase errors. Moving the mirror by hand records every fringe it passes. The mirror speed runs from 0.5 µm/s, slow enough to watch each wave fall in and out of step, to 1,000 µm/s; a real mirror sweeps much faster, so a real scan takes about a second and many scans are averaged.</li>
-            <li>The drawing of the instrument magnifies the waves (3 drawing units per micrometre of wavelength) and, at 800 and 400 cm⁻¹, the mirror's movement twice as much, so the reflected wave moves with the mirror while keeping its true phase; at 4 cm⁻¹ the travel is drawn smaller and the beam as a line. The waves are frozen in place, and in each arm the wave going out and the wave reflected back overlap. With two wavelengths, wavenumber 2's wave is drawn in proportion to the square root of its brightness, because a wave's brightness goes as its height squared: at 30 % it is about half as tall as wavenumber 1's, which keeps its height. Between the readings, every 0.6328 µm of path difference, the charts draw the smooth curve the readings describe (band-limited, windowed-sinc interpolation), as the readings hold every wavenumber up to about 7,900 cm⁻¹.</li>
-          </ul>
-
-          <h3>Keyboard</h3>
-          <p>Tab moves between controls; arrow keys move the sliders. The wavenumber and Mirror position boxes take an exact value (Enter applies it, Escape abandons the edit); a wavenumber box also takes a wavelength, such as 6 µm. The Detector Signal chart's description gives the present reading, and every value is in the tables. Alt + Shift + P (Option + Shift + P on a Mac) switches presentation mode on and off, and Escape leaves it.</p>
+      <div class="tab-panel" role="tabpanel" id="panel-ft" aria-labelledby="tab-ft" tabindex="0" hidden>
+        <div id="ft-fold">
+          <h2 id="ft-title" class="visually-hidden">From Interferogram to Spectrum</h2>
+          <div class="ft-side">
+          <p class="card-sub">The Fourier transform turns the interferogram you recorded into a spectrum, one wavenumber at a time.</p>
+          <details class="table-view ft-how">
+            <summary>How the transform works</summary>
+            <div class="ft-text">
+              <p>For each wavenumber, the transform asks how much of the interferogram is a cosine wave of that wavenumber. Multiply the interferogram by cos(2πν̃δ) and add up the product over the whole scan. Where the two keep in step, the product stays positive and the sum is large; where they drift in and out of step, the positive and negative parts cancel. Each sum, the relative product area, is one point of the spectrum: the green bar at the probe in the bottom panel is as tall as that sum. The spectrum starts whole, as the fast Fourier transform (FFT) computes every wavenumber at once; Sweep builds it again from 400 cm⁻¹, one probe wavenumber at a time, and Clear Points empties it so you can build it by moving the probe.</p>
+              <p>The interferogram here is the recording with its average level subtracted, so it is centred on zero; only the part that goes up and down carries information about wavenumbers. The mirror records only positive path differences, from zero to the end of its travel, and the product's area is taken over that range. An interferogram is symmetric about zero path difference, so the negative side would only add the same area again, and dividing by the background cancels that doubling.</p>
+            </div>
+          </details>
+          <div class="probe-row">
+            <div class="control probe-control">
+              <div class="control-head">
+                <label for="probe">Probe wavenumber</label>
+                <span id="probe-out" class="value-out"></span>
+              </div>
+              <input id="probe" type="range" min="400" max="4000" step="1" value="1000" aria-describedby="probe-sub" autocomplete="off">
+              <p class="control-sub" id="probe-sub">400 to 4000 cm⁻¹; every wavenumber the probe passes adds its point to the spectrum</p>
+            </div>
+            <div class="probe-buttons">
+              <button id="sweep" class="btn primary" type="button">Sweep</button>
+              <button id="fft-all" class="btn" type="button">Transform All (FFT)</button>
+              <button id="clear-points" class="btn" type="button">Clear Points</button>
+            </div>
+          </div>
+          <dl class="state-list probe-list">
+            <div><dt>Relative product area</dt><dd id="probe-sum"></dd></div>
+            <div><dt>Spectrum points</dt><dd id="probe-count"></dd></div>
+          </dl>
+          <div class="ft-options">
+            <div class="step-options" id="step-zoom-row">
+              <span class="option-label" id="step-zoom-label">View</span>
+              <div class="chips" role="group" aria-labelledby="step-zoom-label">
+                <button type="button" class="chip" data-step-zoom="near" aria-pressed="true">Near zero path difference (0 to 40 µm)</button>
+                <button type="button" class="chip" data-step-zoom="whole" aria-pressed="false">Whole scan</button>
+              </div>
+            </div>
+            <label class="check apod-check"><input type="checkbox" id="show-apod"> Show apodization</label>
+          </div>
+          <div class="ft-text apod-block" id="apod-block" hidden>
+            <p>The recording stops abruptly at the ends of the scan. In the spectrum, that sudden edge puts ripples on both sides of every sharp line. Multiplying the interferogram by a window that falls smoothly to zero at the ends (apodization, “removing the feet”) removes most of the ripples, at the cost of somewhat wider lines. The window is drawn dotted around the interferogram; compare the peaks in the spectrum with each window.</p>
+            <div class="option-group">
+              <span class="option-label" id="win-label">Window</span>
+              <div class="chips" role="group" aria-labelledby="win-label">
+                <button type="button" class="chip" data-win="none" aria-pressed="true">None</button>
+                <button type="button" class="chip" data-win="triangular" aria-pressed="false">Triangular</button>
+                <button type="button" class="chip" data-win="happ-genzel" aria-pressed="false">Happ-Genzel</button>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="visual chart-visual step-visual" id="step-visual">
+            <canvas id="step-canvas" role="img" aria-label="The Fourier transform at the probe wavenumber. The values are in the two tables on this tab."></canvas>
+          </div>
+          <div class="ft-under">
+          <label class="check bg-check"><input type="checkbox" id="show-bg"> Overlay the background on the spectrum (the empty holder)</label>
+          <ul class="legend ft-legend" role="list" id="step-legend"></ul>
+          </div>
+          <div class="ft-after">
+          <p class="run-status" id="step-status" role="status"></p>
+          <details class="table-view" id="step-table-view">
+            <summary>Show the interferogram, probe cosine and product as a table</summary>
+            <p class="table-note" id="step-table-note"></p>
+            <div class="table-scroll">
+              <table id="step-table">
+                <caption class="visually-hidden" id="step-table-caption">Values for the Fourier transform at the probe wavenumber</caption>
+                <thead><tr><th scope="col">Path difference, δ (µm)</th><th scope="col">Interferogram (% points)</th><th scope="col">Probe cosine</th><th scope="col">Product</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </details>
+          <details class="table-view" id="ft-spec-table-view">
+            <summary>Show the spectrum so far and the background as a table</summary>
+            <p class="table-note" id="ft-spec-table-note"></p>
+            <div class="table-scroll">
+              <table id="ft-spec-table">
+                <caption class="visually-hidden">The spectrum built so far and the background</caption>
+                <thead><tr><th scope="col">Wavenumber (cm⁻¹)</th><th scope="col">Wavelength (µm)</th><th scope="col">Relative product area (spectrum so far)</th><th scope="col">Background (relative)</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </details>
+          </div>
         </div>
-      </details>
-    </section>
+      </div>
+
+      <div class="tab-panel notes-body" role="tabpanel" id="panel-about" aria-labelledby="tab-about" tabindex="0" hidden>
+        <h2 id="notes-title" class="visually-hidden">About the Model</h2>
+        <p class="about-lede">Move the mirror of the interferometer inside an FTIR spectrometer and record an interferogram, then follow the Fourier transform that turns it into a spectrum showing which wavelengths the sample absorbs.</p>
+        <h3>Using the page</h3>
+        <p>Choose a source and a sample in the toolbar, then move the mirror: drag it in the drawing, use the slider under it, or press Scan. Settings holds the wavenumber sliders, the brightness of wavenumber 2 and the recording settings (resolution, speed, noise, scans). See the results opens this page of results, which follows the instrument as it records; Back to the instrument, or the browser's Back button, returns to it. The drawing is a top view. The beamsplitter sends half of the light to the fixed mirror and half to the movable mirror; the halves come back, recombine and travel through the sample to the detector.</p>
+
+        <h3>The interferometer</h3>
+        <p>A Michelson interferometer splits the beam in two at the beamsplitter. One half goes to a fixed mirror and the other to a mirror that moves; both come back and recombine. If the movable mirror is a distance <em>x</em> further away than the fixed one, its half travels an extra 2<em>x</em>, the path difference δ = 2<em>x</em>. Light of wavenumber ν̃ (wavelength λ = 1/ν̃) arrives in step when δ is a whole number of wavelengths and opposite when it is a whole number plus a half, so its brightness at the detector is ½<em>B</em>(ν̃)[1 + cos 2πν̃δ]. The detector adds up every wavenumber in the beam. That sum, plotted against δ, is the interferogram.</p>
+        <p>Changing the light source, a wavenumber, the sample, the noise or the resolution starts a new recording, so the signal is drawn again as the mirror moves. At zero path difference every wavenumber is in step, so the signal is largest there: the centerburst. Away from it, the different wavenumbers fall in and out of step at different rates and mostly cancel, and the signal settles near half its largest value. A sample in the beam removes light at the wavenumbers it absorbs, which changes the interferogram slightly everywhere.</p>
+
+        <h3>Transform and transmittance</h3>
+        <p>The spectrum is recovered with the cosine Fourier transform, <em>B</em>(ν̃) ∝ Σ <em>I</em>(δ) cos(2πν̃δ), summed over every recorded δ after the average is subtracted. The Transform tab does this one wavenumber at a time; the fast Fourier transform (FFT) does all of them at once. The interferogram is padded with zeros to 32,768 points before the FFT, which spaces the spectrum's points about 0.48 cm⁻¹ apart without adding any detail.</p>
+        <p>Transmittance is the sample's single-beam spectrum divided by the background (the same scan with the holder empty), T = I ÷ I<sub>0</sub>, and absorbance is A = −log<sub>10</sub> T. Wavelength and wavenumber are related by λ (µm) = 10,000 ÷ ν̃ (cm⁻¹).</p>
+
+        <h3>Sampling and resolution</h3>
+        <p>A real instrument reads the detector each time a helium–neon reference laser's interference fringe passes, every 0.6328 µm of path difference. The page does the same, so the highest wavenumber the transform can report is 1 ÷ (2 × 0.6328 µm), about 7,900 cm⁻¹, comfortably above the 4,000 cm⁻¹ shown. Two lines closer together than about 1 ÷ δ<sub>max</sub> cannot be told apart, where δ<sub>max</sub> is the largest path difference recorded. The Resolution setting chooses the mirror's travel to match, and puts the mirror back at zero path difference: 0 to 6.25 µm at 800 cm⁻¹ and 0 to 12.5 µm at 400 cm⁻¹, enough to watch the longest wavelength (20 µm) go through its interference cycles, and short enough for the slider to move smoothly through every fringe. Travels this short give broad spectra: bands closer together than the resolution merge into one. For recording spectra, 4 cm⁻¹ moves the mirror from 0 to 1,250 µm, δ<sub>max</sub> = 0.25 cm, as a laboratory FTIR does; choosing it sets the mirror speed to 1,000 µm/s so a scan takes a few seconds, and choosing a low resolution again puts the speed back.</p>
+
+        <h3>Noise and averaging</h3>
+        <p>With Noise on, each reading gets random detector noise of 0.04 % of the largest signal, and averaging n scans divides it by √n, so 4 scans halve the noise and 64 scans cut it eightfold. Because a scan takes so little time, an FTIR can average many scans in the time a dispersive instrument takes for one; this is the multiplex advantage. The background is taken as noise-free, so all the noise in the transmittance comes from the sample's scan. The noise figure under the Spectrum is the difference from the same transform without noise. With noise, the Absorptions table lists a dip only where it stands at least seven times the noise clear of its surroundings and of 100 %: noise alone makes dips four or five times its size many times across a spectrum, but almost never seven. One scan at 4 cm⁻¹ is noisy enough to hide the weaker bands; averaging 16 scans brings nearly all of them out.</p>
+
+        <h3>Unknowns</h3>
+        <p>Unknown A, B and C are three of the five liquids, chosen at random each time the page loads or New Unknowns is pressed. They are drawn as liquid cells, so the holder gives nothing away.</p>
+
+        <h3>Simplifications</h3>
+        <ul>
+          <li>The interferogram is ideal unless Noise is on: no stray light, a perfect 50:50 beamsplitter, and a mirror that moves perfectly straight.</li>
+          <li>The broadband source is a blackbody at 1,500 K, cut off below about 440 cm⁻¹ and above about 4,300 cm⁻¹ by the beamsplitter and detector.</li>
+          <li>Each sample's spectrum is a set of idealized IR bands at the positions found in reference IR spectra of the liquid, film or gas, with rounded widths and heights; Raman-only vibrations are left out. Liquids are drawn as thin films between potassium bromide (KBr) windows, which pass infrared down to 400 cm⁻¹, polystyrene as a film on a card, and carbon dioxide as a gas cell; each carbon dioxide band is drawn as one smooth band, without the rotational structure a real gas shows.</li>
+          <li>The fingerprint region is shaded from 600 to 1,200 cm⁻¹.</li>
+          <li>Scan works as a real instrument does: each scan is a new recording; the mirror returns quickly to zero path difference without recording, then sweeps at constant speed to the end of its travel, read at every reference-laser fringe. The mirror's travel starts at zero path difference, so the recording is one side of the interferogram (single-sided); an ideal interferogram is symmetric, so the transform takes the other side as its mirror image and the spectrum is the same as from both sides. A real instrument's interferogram is slightly lopsided, from small phase errors in the beamsplitter and electronics, so an instrument recording one side also records a short stretch on the other side of zero and uses it to correct them; this idealized model has no phase errors. Moving the mirror by hand records every fringe it passes. The mirror speed runs from 0.5 µm/s, slow enough to watch each wave fall in and out of step, to 1,000 µm/s; a real mirror sweeps much faster, so a real scan takes about a second and many scans are averaged.</li>
+          <li>The drawing of the instrument magnifies the waves (3 drawing units per micrometre of wavelength) and, at 800 and 400 cm⁻¹, the mirror's movement twice as much, so the reflected wave moves with the mirror while keeping its true phase; at 4 cm⁻¹ the travel is drawn smaller and the beam as a line. The waves are frozen in place, and in each arm the wave going out and the wave reflected back overlap. With two wavelengths, wavenumber 2's wave is drawn in proportion to the square root of its brightness, because a wave's brightness goes as its height squared: at 30 % it is about half as tall as wavenumber 1's, which keeps its height. Between the readings, every 0.6328 µm of path difference, the charts draw the smooth curve the readings describe (band-limited, windowed-sinc interpolation), as the readings hold every wavenumber up to about 7,900 cm⁻¹.</li>
+        </ul>
+
+        <h3>Keyboard</h3>
+        <p>Tab moves between controls; arrow keys move the sliders and, on the row of tabs, between the tabs. Instrument and Results at the top switch between the two pages. The wavenumber and Mirror position boxes take an exact value (Enter applies it, Escape abandons the edit); a wavenumber box also takes a wavelength, such as 6 µm. The Detector Signal chart's description gives the present reading, and every value is in the tables. Alt + Shift + P (Option + Shift + P on a Mac) switches presentation mode on and off, and Escape leaves it.</p>
+
+        <h3>About this page</h3>
+        <p>FTIR Interferometer Explorer is an interactive teaching page: a Michelson interferometer with a choice of light sources and infrared-absorbing samples, its interferogram, and the Fourier transform that turns the interferogram into a spectrum. Path difference sampled every 0.6328 µm; broadband source at 1,500 K.</p>
+      </div>
+    </div>
+    </div>
   </main>
 
   <footer class="site-footer">
-    <p>FTIR Interferometer Explorer is an interactive teaching page: a Michelson interferometer with a choice of light sources and infrared-absorbing samples, its interferogram, and the Fourier transform that turns the interferogram into a spectrum. Path difference sampled every 0.6328 µm; broadband source at 1,500 K. Its <a href="https://github.com/analyticalchem/interferometer">source code is on GitHub</a>.</p>
-    <p>Part of analyticalchem · <a href="https://analyticalchem.github.io/">All projects</a></p>
+    <p>FTIR Interferometer Explorer, an interactive teaching page · <a href="https://github.com/analyticalchem/interferometer">Source code on GitHub</a> · Part of analyticalchem · <a href="https://analyticalchem.github.io/">All projects</a></p>
   </footer>
 
   <p id="present-status" class="visually-hidden" role="status"></p>
 
-  <script src="js/page.js"></script>
-  <script src="js/samples.js"></script>
-  <script src="js/model.js"></script>
-  <script src="js/sim.js"></script>
-  <script src="js/charts.js"></script>
-  <script src="js/diagram.js"></script>
-  <script src="js/steps.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/page.js?v=20261019-1"></script>
+  <script src="js/samples.js?v=20261019-1"></script>
+  <script src="js/model.js?v=20261019-1"></script>
+  <script src="js/sim.js?v=20261019-1"></script>
+  <script src="js/charts.js?v=20261019-1"></script>
+  <script src="js/diagram.js?v=20261019-1"></script>
+  <script src="js/steps.js?v=20261019-1"></script>
+  <script src="js/main.js?v=20261019-1"></script>
+  <script src="js/layout.js?v=20261019-1"></script>
 </body>
 </html>
